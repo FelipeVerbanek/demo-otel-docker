@@ -5,11 +5,11 @@ import { check, sleep } from 'k6';
 export const options = {
   stages: [
     { duration: '2m', target: 1 },   // Sobe para 10 VUs em 2 minutos
-    // { duration: '3m', target: 20 },   // Aumenta para 50 VUs em 3 minutos
-    // { duration: '5m', target: 30 },  // Atinge 100 VUs em 5 minutos
-    // { duration: '3m', target: 20 },   // Reduz para 50 VUs em 3 minutos
-    // { duration: '2m', target: 10 },   // Volta para 10 VUs em 2 minutos
-    // { duration: '1m', target: 0 },    // Finaliza o teste
+    { duration: '3m', target: 20 },   // Aumenta para 50 VUs em 3 minutos
+    { duration: '5m', target: 30 },  // Atinge 100 VUs em 5 minutos
+    { duration: '3m', target: 20 },   // Reduz para 50 VUs em 3 minutos
+    { duration: '2m', target: 10 },   // Volta para 10 VUs em 2 minutos
+    { duration: '1m', target: 0 },    // Finaliza o teste
   ],
 };
 
