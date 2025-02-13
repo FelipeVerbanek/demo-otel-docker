@@ -67,7 +67,7 @@ connectors:
   spanmetrics:
     histogram:
       explicit:
-        buckets: [0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 3, 5, 8, 10, 15, 20, 25, 30, 40, 60]
+        buckets: [10us, 30us, 60us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms, 500ms, 1s,2s,3s,4s]
     dimensions:
       - name: http.method
         default: GET

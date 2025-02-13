@@ -26,7 +26,7 @@ export function otelSetup() {
   provider.addSpanProcessor(new SimpleSpanProcessor(exporter))
 
   registerInstrumentations({
-    tracerProvider: provider
+    tracerProvider: provider,
   })
 
   provider.register()
