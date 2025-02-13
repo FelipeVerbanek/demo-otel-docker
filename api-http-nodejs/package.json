@@ -1,0 +1,41 @@
+{
+  "scripts": {
+    "dev": "ts-node-dev --inspect --transpile-only --ignore-watch node_modules src/server.ts",
+    "build": "tsc",
+    "migration:run": "npx typeorm-ts-node-commonjs migration:run -d  ./src/database/config.ts"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "prisma": "^5.22.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.12.2",
+    "@grpc/proto-loader": "^0.7.13",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.56.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.57.1",
+    "@opentelemetry/instrumentation-pg": "^0.51.0",
+    "@opentelemetry/instrumentation-winston": "^0.44.0",
+    "@opentelemetry/sdk-node": "^0.57.1",
+    "@opentelemetry/sdk-trace-node": "^1.30.1",
+    "@prisma/client": "^5.22.0",
+    "@prisma/instrumentation": "^5.22.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "nanoid": "^5.0.8",
+    "opentelemetry-instrumentation-typeorm": "^0.41.0",
+    "pg": "^8.13.1",
+    "typeorm": "^0.3.20",
+    "uuid": "^11.0.2",
+    "winston": "^3.16.0",
+    "winston-loki": "^6.1.3"
+  },
+  "name": "api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

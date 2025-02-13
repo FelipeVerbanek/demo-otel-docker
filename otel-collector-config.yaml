@@ -1,0 +1,80 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+exporters:
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    const_labels:
+      label1: value1
+
+  zipkin:
+    endpoint: "http://zipkin-all-in-one:9411/api/v2/spans"
+    format: proto
+
+  otlp:
+    endpoint: jaeger-all-in-one:4317
+    tls:
+      insecure: true
+
+processors:
+  filter/spanmetrics:
+    traces:
+      span:
+        - 'kind.string != "Server"'
+  batch:
+
+extensions:
+  health_check:
+  pprof:
+    endpoint: :1888
+  zpages:
+    endpoint: :55679
+
+service:
+  telemetry:
+    logs:
+      level: "debug"  
+    metrics:
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: '0.0.0.0'
+                port: 8888      
+
+  extensions: [pprof, zpages, health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [zipkin, otlp]
+    traces/metrics:
+      receivers: ["otlp"]
+      processors: [filter/spanmetrics]
+      exporters: [spanmetrics]
+    metrics:
+      receivers: [otlp, spanmetrics]
+      processors: [batch]
+      exporters: [prometheus]
+
+
+connectors:
+  spanmetrics:
+    histogram:
+      explicit:
+        buckets: [0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 3, 5, 8, 10, 15, 20, 25, 30, 40, 60]
+    dimensions:
+      - name: http.method
+        default: GET
+      - name: http.status_code
+    exemplars:
+      enabled: true
+    dimensions_cache_size: 1000
+    aggregation_temporality: "AGGREGATION_TEMPORALITY_CUMULATIVE"    
+    metrics_flush_interval: 15s
+    metrics_expiration: 5m

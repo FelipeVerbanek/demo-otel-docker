@@ -1,0 +1,2 @@
+histogram_quantile(0.99, sum(rate(http_request_duration_seconds_cotacao_milliseconds_bucket{cotacao="USD"}[5m])) by (le))
+rate(http_request_duration_seconds_cotacao_milliseconds_count{cotacao="USD", exported_job="cotacao-grpc", http_method="GET", http_url="https://economia.awesomeapi.com.br/json/last/USD"}[1m]) * 60

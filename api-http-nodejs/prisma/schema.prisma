@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["tracing", "interactiveTransactions"]
+}
+model migrations {
+  id        Int    @id(map: "PK_8c82d7f526340ab734260ea46be") @default(autoincrement())
+  timestamp BigInt
+  name      String @db.VarChar
+}
+
+model orders {
+  id          Int      @id(map: "PK_710e2d4957aa5878dfe94e4ac2f") @default(autoincrement())
+  orderNumber String   @unique(map: "UQ_59b0c3b34ea0fa5562342f24143") @db.VarChar
+  totalAmount Decimal  @db.Decimal(10, 2)
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @db.Timestamp(6)
+  customerId  Int?
+  status      String   @default("pending") @db.VarChar
+  users       users?   @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_e5de51ca888d8b1f5ac25799dd1")
+}
+
+model users {
+  id        Int      @id(map: "PK_a3ffb1c0c8416b9fc6f907b7433") @default(autoincrement())
+  firstName String   @db.VarChar
+  lastName  String   @db.VarChar
+  age       Int
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @db.Timestamp(6)
+  orders    orders[]
+}

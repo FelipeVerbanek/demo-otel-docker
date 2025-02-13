@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: "otel"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "admin"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  api-otel-grpc:
+    build: ./api-grpc-nodejs
+    image: api-otel-grpc:1.0.0
+    container_name: api-otel-grpc
+    restart: always
+    ports:
+      - "50051:50051"
+    environment:
+      GRPC_HOST: "0.0.0.0:50051"
+      NODE_ENV: "production"
+      REDIS: "redis"
+    depends_on:
+      - redis
+      - postgres
+
+  api-http:
+    build: ./api-http-nodejs
+    image: api-otel:1.0.0
+    container_name: api-http
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://postgres:admin@postgres:5432/otel?schema=public"
+      NODE_ENV: "production"
+      HOST_GRPC: "api-otel-grpc:50051"
+    depends_on:
+      - postgres
+      - api-otel-grpc
+
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    restart: always
+    ports:
+      - "16686:16686"
+      - "14268"
+      - "14250"
+    depends_on:
+      - api-otel-grpc
+      - api-http
+
+
+  # Zipkin
+  zipkin-all-in-one:
+    image: openzipkin/zipkin:latest
+    environment:
+      - JAVA_OPTS=-Xms1024m -Xmx1024m -XX:+ExitOnOutOfMemoryError
+    restart: always
+    ports:
+      - "9411:9411"
+    depends_on:
+      - api-otel-grpc
+      - api-http
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.119.0
+    restart: always
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "1888:1888"   # pprof extension
+      - "8888:8888"   # Prometheus metrics exposed by the collector
+      - "8889:8889"   # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4118"
+      - "55679:55679" # zpages extension
+    depends_on:
+      - jaeger-all-in-one
+      - zipkin-all-in-one
+
+  prometheus:
+    image: prom/prometheus:latest
+    restart: always
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"      
+
+volumes:
+  postgres_data:
+    driver: local
