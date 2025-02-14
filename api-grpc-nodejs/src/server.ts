@@ -1,5 +1,5 @@
 import { otelSetup } from './infra/otel'
-//otelSetup()
+otelSetup()
 import dotenv from "dotenv";
 import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';

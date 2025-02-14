@@ -15,28 +15,12 @@ class LoggerService {
                 winston.format.json()
               ),
               transports: [
-                // Se o ambiente for 'development', usa o LokiTransport; caso contrário, usa Console
-                ...(process.env.NODE_ENV === 'development'
-                  ? [
-                      new LokiTransport({
-                        host: loki_host,
-                        json: true,
-                        format: winston.format.combine(
-                          winston.format.errors({ stack: true }),
-                          winston.format.json()
-                        ),
-                        labels: { job: 'api' },
-                        onConnectionError: (err) => console.error('Erro de conexão com Loki:', err),
-                      }),
-                    ]
-                  : [
-                      new winston.transports.Console({
-                        format:winston.format.combine(
-                            winston.format.errors({ stack: true }),
-                            winston.format.json()
-                        )
-                      }),
-                    ]),
+                new winston.transports.Console({
+                  format:winston.format.combine(
+                      winston.format.errors({ stack: true }),
+                      winston.format.json()
+                  )
+                })
               ],
         });
 

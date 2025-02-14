@@ -8,6 +8,8 @@ import {
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks'
 import * as api from '@opentelemetry/api'
 import { Resource } from '@opentelemetry/resources'
+import { PrismaInstrumentation } from '@prisma/instrumentation';
+import { WinstonInstrumentation } from '@opentelemetry/instrumentation-winston';
 
 
 export function otelSetup() {
@@ -27,6 +29,15 @@ export function otelSetup() {
 
   registerInstrumentations({
     tracerProvider: provider,
+    instrumentations: [
+      getNodeAutoInstrumentations(),
+      new PrismaInstrumentation(),
+      new WinstonInstrumentation({
+        logHook: (span, record) => {
+          record['resource.service.name'] = 'cotaca-grpc';
+        },
+      }),
+    ]
   })
 
   provider.register()
